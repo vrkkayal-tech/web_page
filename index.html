@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-Driven Antimicrobial Resistance (AMR)</title>
+  <meta name="description" content="Using machine learning to support prediction, detection and rational antibiotic use in antimicrobial resistance (AMR).">
+  <style>
+    :root {
+      --color-navy: #0b2f5b;
+      --color-blue: #1565c0;
+      --color-sky: #4a9be8;
+      --color-ice: #e8f2fc;
+      --color-ice-border: #c8e0f8;
+      --color-bg: #f4f9fe;
+      --color-white: #ffffff;
+      --color-text: #17283d;
+      --color-text-muted: #4e637a;
+      --color-card-border: #d2e4f7;
+      --color-red: #c62828;
+      --color-red-border: #d32f2f;
+      --color-red-bg: #fdf2f2;
+      --color-red-box-border: #fca5a5;
+      --color-subtitle: #cce3fd;
+      --radius-card: 14px;
+      --radius-img: 10px;
+      --radius-badge: 8px;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Accessibility Focus */
+    :focus-visible {
+      outline: 3px solid var(--color-sky);
+      outline-offset: 3px;
+    }
+
+    /* Header Bar */
+    .site-header {
+      background-color: var(--color-navy);
+      color: var(--color-white);
+      padding: 2.25rem 1.25rem 2rem;
+      text-align: center;
+      border-bottom: 4px solid var(--color-blue);
+      box-shadow: 0 4px 14px rgba(11, 47, 91, 0.15);
+    }
+
+    .header-content {
+      max-width: 820px;
+      margin: 0 auto;
+    }
+
+    .site-title {
+      font-size: 1.55rem;
+      font-weight: 800;
+      line-height: 1.25;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.6rem;
+      color: var(--color-white);
+    }
+
+    .site-subtitle {
+      font-size: 1rem;
+      font-weight: 400;
+      line-height: 1.45;
+      color: var(--color-subtitle);
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    @media (min-width: 640px) {
+      .site-header {
+        padding: 3rem 1.5rem 2.5rem;
+      }
+      .site-title {
+        font-size: 2.15rem;
+      }
+      .site-subtitle {
+        font-size: 1.125rem;
+      }
+    }
+
+    /* Page Container */
+    .page-container {
+      width: 100%;
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 1.25rem 1rem 2rem;
+    }
+
+    @media (min-width: 640px) {
+      .page-container {
+        padding: 2rem 1.5rem 3rem;
+      }
+    }
+
+    /* Poster Card (First Card) */
+    .poster-card {
+      background: var(--color-white);
+      border: 2px solid var(--color-blue);
+      border-radius: var(--radius-card);
+      box-shadow: 0 6px 20px rgba(11, 47, 91, 0.1);
+      padding: 1rem;
+      margin-bottom: 1.75rem;
+      text-align: center;
+    }
+
+    .poster-link {
+      display: block;
+      text-decoration: none;
+      border-radius: var(--radius-img);
+      overflow: hidden;
+      border: 1px solid var(--color-card-border);
+      background-color: var(--color-ice);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .poster-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(21, 101, 192, 0.22);
+    }
+
+    .poster-image {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      border-radius: inherit;
+    }
+
+    .poster-hint {
+      margin-top: 0.85rem;
+      margin-bottom: 0.25rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-blue);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+    }
+
+    /* Standard Content Cards */
+    .content-card {
+      background-color: var(--color-white);
+      border: 1px solid var(--color-card-border);
+      border-left: 6px solid var(--color-blue);
+      border-radius: var(--radius-card);
+      box-shadow: 0 3px 14px rgba(11, 47, 91, 0.05);
+      padding: 1.35rem 1.15rem;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (min-width: 640px) {
+      .content-card {
+        padding: 1.75rem 1.65rem;
+        margin-bottom: 1.75rem;
+      }
+    }
+
+    .card-heading {
+      color: var(--color-navy);
+      font-size: 1.25rem;
+      font-weight: 700;
+      line-height: 1.35;
+      margin-bottom: 1rem;
+    }
+
+    @media (min-width: 640px) {
+      .card-heading {
+        font-size: 1.45rem;
+      }
+    }
+
+    .card-text {
+      color: var(--color-text);
+      font-size: 0.985rem;
+      line-height: 1.65;
+      margin-bottom: 0.9rem;
+    }
+
+    .card-text:last-of-type {
+      margin-bottom: 0;
+    }
+
+    .card-intro-text {
+      color: var(--color-text);
+      font-size: 0.985rem;
+      line-height: 1.55;
+      margin-bottom: 0.9rem;
+      font-weight: 500;
+    }
+
+    /* Card Images */
+    .card-image {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      border-radius: var(--radius-img);
+      border: 1px solid var(--color-card-border);
+      margin-top: 1.25rem;
+    }
+
+    /* Numbered Lists with CSS Counters */
+    .badge-numbered-list {
+      list-style: none;
+      counter-reset: step-counter;
+      padding: 0;
+      margin: 1rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .badge-numbered-list li {
+      counter-increment: step-counter;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.85rem;
+      background-color: var(--color-ice);
+      border: 1px solid var(--color-ice-border);
+      border-radius: var(--radius-badge);
+      padding: 0.85rem 1rem;
+      color: var(--color-text);
+      font-size: 0.95rem;
+      line-height: 1.55;
+    }
+
+    .badge-numbered-list li::before {
+      content: counter(step-counter);
+      flex-shrink: 0;
+      width: 1.75rem;
+      height: 1.75rem;
+      background-color: var(--color-blue);
+      color: var(--color-white);
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.875rem;
+      font-weight: 700;
+      margin-top: 0.05rem;
+    }
+
+    .list-lead-phrase {
+      color: var(--color-navy);
+      font-weight: 700;
+    }
+
+    /* Advantages 2-Column Grid on 640px+ */
+    .advantage-images-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      margin-top: 1.25rem;
+    }
+
+    @media (min-width: 640px) {
+      .advantage-images-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem;
+      }
+    }
+
+    .advantage-images-grid .card-image {
+      margin-top: 0;
+    }
+
+    /* Disadvantages / Limitations Card (Red Accent Only) */
+    .content-card-disadvantages {
+      border-left: 6px solid var(--color-red-border);
+    }
+
+    .heading-red {
+      color: var(--color-red);
+    }
+
+    .disadvantages-list {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .disadvantages-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      background-color: var(--color-red-bg);
+      border: 1px solid var(--color-red-box-border);
+      border-radius: var(--radius-badge);
+      padding: 0.85rem 1rem;
+      color: var(--color-text);
+      font-size: 0.95rem;
+      line-height: 1.55;
+    }
+
+    .disadvantages-list li::before {
+      content: "•";
+      color: var(--color-red);
+      font-size: 1.4rem;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: -0.1rem;
+    }
+
+    /* Closing Note Bar */
+    .closing-note-bar {
+      background-color: var(--color-navy);
+      color: var(--color-white);
+      border-radius: var(--radius-card);
+      padding: 1.25rem 1.4rem;
+      margin: 2rem 0 1.5rem;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 4px 16px rgba(11, 47, 91, 0.12);
+    }
+
+    .closing-note-text {
+      margin: 0;
+      font-size: 0.975rem;
+      font-weight: 600;
+      line-height: 1.55;
+      color: var(--color-white);
+    }
+
+    /* Footer */
+    .site-footer {
+      text-align: center;
+      padding: 1rem 1rem 2.5rem;
+      color: var(--color-text-muted);
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    .site-footer p {
+      margin: 0.25rem 0;
+    }
+
+    /* Motion preferences */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header Bar -->
+  <header class="site-header">
+    <div class="header-content">
+      <h1 class="site-title">AI-Driven Antimicrobial Resistance (AMR)</h1>
+      <p class="site-subtitle">Using machine learning to support prediction, detection and rational antibiotic use</p>
+    </div>
+  </header>
+
+  <main class="page-container">
+
+    <!-- 1. Poster Image Card -->
+    <section class="poster-card" aria-label="Research Poster">
+      <a href="images/poster.jpeg" target="_blank" rel="noopener" class="poster-link" title="Tap to view full-size poster">
+        <img src="images/poster.jpeg" alt="Research poster for AI-Driven Antimicrobial Resistance (AMR)" class="poster-image">
+      </a>
+      <p class="poster-hint">Tap the poster to view it in full size.</p>
+    </section>
+
+    <!-- 2. Introduction -->
+    <section class="content-card" aria-labelledby="intro-heading">
+      <h2 id="intro-heading" class="card-heading">Introduction</h2>
+      <p class="card-text">Antimicrobial resistance (AMR) is a major global health problem in which microorganisms such as bacteria, viruses, fungi and parasites develop the ability to resist medicines designed to kill them or stop their growth. As a result, antimicrobial drugs become less effective, making infections difficult to treat.</p>
+      <p class="card-text">Overuse and misuse of antibiotics, incomplete treatment and improper antibiotic use contribute to the development and spread of resistance. AMR can lead to prolonged illness, treatment failure, increased healthcare costs and a higher risk of death.</p>
+      <p class="card-text">Artificial Intelligence (AI) can help predict, detect and analyse resistance patterns, supporting healthcare professionals in selecting appropriate treatments and preventing the spread of AMR.</p>
+      <img src="images/introduction.jpeg" alt="Microscopic illustration representing antimicrobial resistance and bacterial cellular structures" loading="lazy" class="card-image">
+    </section>
+
+    <!-- 3. Objectives -->
+    <section class="content-card" aria-labelledby="objectives-heading">
+      <h2 id="objectives-heading" class="card-heading">Objectives of AI-Driven Antimicrobial Resistance (AMR)</h2>
+      <p class="card-intro-text">The main objectives of using Artificial Intelligence (AI) in AMR are:</p>
+      <ol class="badge-numbered-list">
+        <li>
+          <span><strong class="list-lead-phrase">Predict and Detect AMR:</strong> To identify and predict antimicrobial resistance at an early stage using AI technologies.</span>
+        </li>
+        <li>
+          <span><strong class="list-lead-phrase">Analyse Resistance Patterns:</strong> To study bacterial resistance patterns using machine learning.</span>
+        </li>
+        <li>
+          <span><strong class="list-lead-phrase">Support Antibiotic Selection:</strong> To help healthcare professionals choose appropriate antibiotics for effective treatment.</span>
+        </li>
+        <li>
+          <span><strong class="list-lead-phrase">Reduce Antibiotic Misuse:</strong> To promote the proper use of antibiotics and prevent the development and spread of antimicrobial resistance.</span>
+        </li>
+      </ol>
+      <img src="images/objective.jpeg" alt="Conceptual representation of AI analytics and data models supporting healthcare objectives" loading="lazy" class="card-image">
+    </section>
+
+    <!-- 4. Methodology -->
+    <section class="content-card" aria-labelledby="methodology-heading">
+      <h2 id="methodology-heading" class="card-heading">Methodology</h2>
+      <p class="card-intro-text">The methodology of AI-driven antimicrobial resistance involves four important steps.</p>
+      <ol class="badge-numbered-list">
+        <li>
+          <span><strong class="list-lead-phrase">Data Collection:</strong> Bacterial culture samples and antibiotic susceptibility data are collected through laboratory tests.</span>
+        </li>
+        <li>
+          <span><strong class="list-lead-phrase">AI-Based Analysis:</strong> Artificial intelligence and machine learning analyse the collected data to identify bacterial resistance patterns.</span>
+        </li>
+        <li>
+          <span><strong class="list-lead-phrase">Resistance Prediction:</strong> AI algorithms predict whether bacteria may be resistant to specific antibiotics.</span>
+        </li>
+        <li>
+          <span><strong class="list-lead-phrase">Treatment Support:</strong> AI helps healthcare professionals identify suitable antibiotic options based on the predicted resistance patterns.</span>
+        </li>
+      </ol>
+      <p class="card-text">These four steps help improve early detection, support appropriate antibiotic selection and promote rational drug use. AI can also help reduce unnecessary antibiotic use and support better patient care.</p>
+      <img src="images/methodology.jpeg" alt="Workflow visualization of laboratory data collection, computational analysis, and treatment decision support" loading="lazy" class="card-image">
+    </section>
+
+    <!-- 5. Advantages -->
+    <section class="content-card" aria-labelledby="advantages-heading">
+      <h2 id="advantages-heading" class="card-heading">Advantages of AI-Driven Antimicrobial Resistance (AMR)</h2>
+      <ol class="badge-numbered-list">
+        <li>
+          <span><strong class="list-lead-phrase">Early Detection:</strong> AI helps identify antimicrobial resistance at an early stage, allowing faster diagnosis and treatment.</span>
+        </li>
+        <li>
+          <span><strong class="list-lead-phrase">Improved Analysis:</strong> Machine learning analyses large amounts of bacterial data and identifies resistance patterns.</span>
+        </li>
+        <li>
+          <span><strong class="list-lead-phrase">Better Antibiotic Selection:</strong> AI supports healthcare professionals in choosing appropriate antibiotics based on predicted resistance.</span>
+        </li>
+        <li>
+          <span><strong class="list-lead-phrase">Reduced Antibiotic Misuse:</strong> It helps avoid unnecessary antibiotic use and promotes rational drug usage.</span>
+        </li>
+        <li>
+          <span><strong class="list-lead-phrase">Faster Decision-Making:</strong> AI analyses laboratory and clinical data quickly, supporting timely treatment decisions.</span>
+        </li>
+        <li>
+          <span><strong class="list-lead-phrase">Improved Patient Care:</strong> Early detection and appropriate treatment support better patient outcomes.</span>
+        </li>
+        <li>
+          <span><strong class="list-lead-phrase">AMR Prevention:</strong> AI helps monitor resistance trends and supports strategies to control the spread of resistant microorganisms.</span>
+        </li>
+      </ol>
+      <div class="advantage-images-grid">
+        <img src="images/advantage-1.jpeg" alt="Human clinician and robotic intelligence collaborating in biomedical data analysis" loading="lazy" class="card-image">
+        <img src="images/advantage-2.jpeg" alt="Global connected health network illustrating rapid digital diagnostics and disease surveillance" loading="lazy" class="card-image">
+      </div>
+    </section>
+
+    <!-- 6. Disadvantages / Limitations -->
+    <section class="content-card content-card-disadvantages" aria-labelledby="disadvantages-heading">
+      <h2 id="disadvantages-heading" class="card-heading heading-red">Disadvantages / Limitations</h2>
+      <ul class="disadvantages-list">
+        <li>Requires large amounts of accurate clinical and laboratory data.</li>
+        <li>High development and maintenance costs.</li>
+        <li>Incorrect or biased data may lead to inaccurate predictions.</li>
+        <li>AI recommendations require validation by qualified healthcare professionals.</li>
+      </ul>
+    </section>
+
+    <!-- 7. Global Burden of AMR -->
+    <section class="content-card" aria-labelledby="burden-heading">
+      <h2 id="burden-heading" class="card-heading">Global Burden of Antimicrobial Resistance (AMR) – 2015 to 2024</h2>
+      <p class="card-text">The graph illustrates the increasing global burden of antimicrobial resistance over the last 10 years. According to the figures shown, approximately 4.1 million people were affected by AMR in 2015, which gradually increased to 5.2 million in 2024. This represents an approximate 27% increase over the decade.</p>
+      <p class="card-text">The trend highlights the growing impact of antimicrobial resistance on global health. It also emphasizes the importance of early detection, proper antibiotic use, effective treatment strategies and AI-based technologies to help predict and control antimicrobial resistance.</p>
+      <img src="images/graph.jpeg" alt="Bar chart depicting the global burden of antimicrobial resistance increasing from 4.1 million in 2015 to 5.2 million in 2024, approximately a 27 percent increase" loading="lazy" class="card-image">
+    </section>
+
+    <!-- 8. Closing Note Bar and Footer -->
+    <aside class="closing-note-bar" role="note" aria-label="Clinical Disclaimer">
+      <p class="closing-note-text">AI supports clinical decision-making; recommendations require professional validation.</p>
+    </aside>
+
+    <footer class="site-footer">
+      <p>AI-Driven Antimicrobial Resistance (AMR) &bull; Poster Competition Presentation</p>
+    </footer>
+
+  </main>
+
+</body>
+</html>
